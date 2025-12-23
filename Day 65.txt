@@ -1,0 +1,87 @@
+Day 65
+
+65. Valid Number
+Hard
+Topics
+premium lock icon
+Companies
+Given a string s, return whether s is a valid number.
+
+For example, all the following are valid numbers: "2", "0089", "-0.1", "+3.14", "4.", "-.9", "2e10", "-90E3", "3e+7", "+6e-1", "53.5e93", "-123.456e789", while the following are not valid numbers: "abc", "1a", "1e", "e3", "99e2.5", "--6", "-+3", "95a54e53".
+
+Formally, a valid number is defined using one of the following definitions:
+
+An integer number followed by an optional exponent.
+A decimal number followed by an optional exponent.
+An integer number is defined with an optional sign '-' or '+' followed by digits.
+
+A decimal number is defined with an optional sign '-' or '+' followed by one of the following definitions:
+
+Digits followed by a dot '.'.
+Digits followed by a dot '.' followed by digits.
+A dot '.' followed by digits.
+An exponent is defined with an exponent notation 'e' or 'E' followed by an integer number.
+
+The digits are defined as one or more digits.
+
+ 
+
+Example 1:
+
+Input: s = "0"
+
+Output: true
+
+Example 2:
+
+Input: s = "e"
+
+Output: false
+
+Example 3:
+
+Input: s = "."
+
+Output: false
+
+My Solution:
+
+def isNumber(s: str) -> bool:
+    s = s.strip()  # Remove leading/trailing spaces
+    if not s:
+        return False
+
+    num_seen = False      # Have we seen a digit yet?
+    dot_seen = False      # Have we seen a '.' yet?
+    e_seen = False        # Have we seen 'e' or 'E' yet?
+    num_after_e = True    # To ensure there's a number after 'e'
+
+    for i, char in enumerate(s):
+        if char.isdigit():
+            num_seen = True
+            if e_seen:
+                num_after_e = True
+        elif char in ['+', '-']:
+            # Sign is only valid at the start or after 'e'
+            if i != 0 and s[i-1] not in ['e', 'E']:
+                return False
+        elif char == '.':
+            if dot_seen or e_seen:  # Dot can't appear after another dot or after 'e'
+                return False
+            dot_seen = True
+        elif char in ['e', 'E']:
+            if e_seen or not num_seen:  # 'e' must appear only once and after a number
+                return False
+            e_seen = True
+            num_after_e = False  # Reset for checking digits after 'e'
+        else:
+            return False
+
+    return num_seen and num_after_e
+
+# Examples
+print(isNumber("0"))           # True
+print(isNumber("e"))           # False
+print(isNumber("."))           # False
+print(isNumber("53.5e93"))     # True
+print(isNumber("-123.456e789"))# True
